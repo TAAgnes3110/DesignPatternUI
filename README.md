@@ -4,10 +4,10 @@ Dự án này minh họa việc áp dụng các Design Pattern (Builder, Facade)
 
 ## 1. Cấu hình Database (pgAdmin 4)
 
-Đảm bảo bạn đã có database với cấu trúc như trong file `HospitalDesignPatterns/database/schema.sql`.
+Đảm bảo bạn đã có database từ https://github.com/TAAgnes3110/DesignPatterns/tree/main/database
 
 ### Bước 1: Thêm dữ liệu mẫu
-Mở **pgAdmin 4**, chọn Database của bạn, mở **Query Tool** và chạy các lệnh trong phần **1. CHUẨN BỊ DỮ LIỆU** của file `database_commands.sql`.
+Mở **pgAdmin 4**, chọn Database của bạn, mở **Query Tool** và chạy các lệnh trong phần **1. CHUẨN BỊ DỮ LIỆU** của file `schema.spl` và file "sample_data.sql".
 Điều này sẽ tạo ra các Bác sĩ và Bệnh nhân để ứng dụng có thể hiển thị.
 
 ## 2. Chạy Ứng dụng Android
