@@ -62,6 +62,3 @@ Minh họa việc sử dụng Builder để tạo một đối tượng `Patient
 *   **`BuilderPatternActivity`**: Sử dụng Builder để tạo đối tượng từ giao diện nhập liệu.
 
 ---
-
-## 5. Các câu lệnh SQL hỗ trợ
-Xem file `database_commands.sql` để biết các lệnh `INSERT`, `UPDATE`, `SELECT` dùng để kiểm tra dữ liệu trong quá trình chạy demo.
