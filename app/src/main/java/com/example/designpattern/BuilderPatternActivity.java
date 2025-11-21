@@ -31,10 +31,6 @@ import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * Activity demo cho Builder Pattern.
- * Tác động đến 1 bảng: Patients.
- */
 public class BuilderPatternActivity extends AppCompatActivity {
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -54,7 +50,7 @@ public class BuilderPatternActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_command_pattern); 
+        setContentView(R.layout.activity_command_pattern);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.commandRoot), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -68,8 +64,7 @@ public class BuilderPatternActivity extends AppCompatActivity {
         findViewById(R.id.buttonQueueUpdate).setVisibility(View.GONE);
         findViewById(R.id.buttonExecuteQueue).setVisibility(View.GONE);
         findViewById(R.id.textCommandQueue).setVisibility(View.GONE);
-        
-        // Đổi tên nút insert
+
         MaterialButton btnInsert = findViewById(R.id.buttonQueueInsert);
         btnInsert.setText("Tạo & Lưu (Builder)");
 
@@ -157,11 +152,11 @@ public class BuilderPatternActivity extends AppCompatActivity {
             try {
                 StringBuilder sb = new StringBuilder();
                 String sql = "SELECT patient_id, first_name, last_name, contact_number FROM Patients ORDER BY patient_id DESC LIMIT 5";
-                
+
                 try (Connection conn = factory.newConnection();
                      Statement stmt = conn.createStatement();
                      ResultSet rs = stmt.executeQuery(sql)) {
-                    
+
                     while (rs.next()) {
                         sb.append(String.format("#%d %s %s (%s)\n",
                                 rs.getInt("patient_id"),
@@ -170,9 +165,9 @@ public class BuilderPatternActivity extends AppCompatActivity {
                                 rs.getString("contact_number")));
                     }
                 }
-                
+
                 if (sb.length() == 0) sb.append("Chưa có dữ liệu.");
-                
+
                 String result = sb.toString();
                 handler.post(() -> {
                     textDataPreview.setText(result);

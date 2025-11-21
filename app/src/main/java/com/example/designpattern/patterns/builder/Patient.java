@@ -24,7 +24,6 @@ public class Patient {
     public String getPhone() { return phone; }
     public String getEmail() { return email; }
 
-    // Builder Class
     public static class Builder {
         private String firstName;
         private String lastName;
