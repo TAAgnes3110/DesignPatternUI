@@ -2,12 +2,12 @@
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/singletonRoot"
+    android:id="@+id/facadeRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/colorSurface"
     android:fillViewport="true"
-    tools:context=".SingletonPatternActivity">
+    tools:context=".FacadePatternActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,6 +15,7 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- Header -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -32,22 +33,17 @@
                 app:tint="@color/material_dynamic_primary10" />
 
             <TextView
+                android:id="@+id/header_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Singleton Pattern"
+                android:text="Facade Pattern"
                 android:textAppearance="@style/TextAppearance.Material3.DisplaySmall"
                 android:textColor="@color/material_dynamic_primary10"
                 android:textStyle="bold"
                 android:layout_marginStart="8dp" />
         </LinearLayout>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="`VisitCoordinator` là singleton duy nhất giữ kết nối, gộp 3 bảng (Appointments, Medical_Records, Billing) vào cùng transaction."
-            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-            android:alpha="0.8" />
-
+        <!-- Booking Appointment Card -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -67,11 +63,20 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Thông tin lịch khám"
+                    android:text="Đặt lịch khám"
                     android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
                     android:textColor="@color/material_dynamic_primary10"
                     android:textStyle="bold" />
 
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Facade sẽ tự động tạo Appointment và Billing"
+                    android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+                    android:alpha="0.7" />
+
+                <!-- Patient ID and Doctor ID -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -88,11 +93,13 @@
                         android:hint="ID bệnh nhân">
 
                         <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/inputSingletonPatientId"
+                            android:id="@+id/inputFacadePatientId"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:inputType="number"
-                            android:text="1" />
+                            android:inputType="none"
+                            android:focusable="false"
+                            android:clickable="true"
+                            android:drawableEnd="@android:drawable/arrow_down_float" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -104,14 +111,17 @@
                         android:hint="ID bác sĩ">
 
                         <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/inputSingletonDoctorId"
+                            android:id="@+id/inputFacadeDoctorId"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:inputType="number"
-                            android:text="3" />
+                            android:inputType="none"
+                            android:focusable="false"
+                            android:clickable="true"
+                            android:drawableEnd="@android:drawable/arrow_down_float" />
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
 
+                <!-- Date and Time -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -125,13 +135,13 @@
                         android:layout_weight="1"
                         android:layout_marginEnd="8dp"
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                        android:hint="Ngày">
+                        android:hint="Ngày (yyyy-mm-dd)">
 
                         <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/inputSingletonDate"
+                            android:id="@+id/inputFacadeDate"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="2025-01-20" />
+                            android:inputType="date" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -140,55 +150,43 @@
                         android:layout_weight="1"
                         android:layout_marginStart="8dp"
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                        android:hint="Giờ">
+                        android:hint="Giờ (HH:mm)">
 
                         <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/inputSingletonTime"
+                            android:id="@+id/inputFacadeTime"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="09:00" />
+                            android:inputType="time" />
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
 
+                <!-- Amount (New Field) -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                    android:hint="Chẩn đoán / mục đích">
+                    android:hint="Số tiền khám ($)">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/inputSingletonDiagnosis"
+                        android:id="@+id/inputFacadeAmount"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Đau dạ dày" />
+                        android:inputType="numberDecimal" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                    android:hint="Chi phí (USD)">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/inputSingletonAmount"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="numberDecimal"
-                        android:text="150.0" />
-                </com.google.android.material.textfield.TextInputLayout>
-
+                <!-- Book Appointment Button -->
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/buttonSingletonSchedule"
+                    android:id="@+id/buttonFacadeSchedule"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
                     app:backgroundTint="@color/material_dynamic_primary10"
-                    android:text="Tạo lịch khám (Transaction)" />
+                    android:text="Đặt lịch &amp; Tạo hóa đơn (Facade)" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Result Card -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -212,7 +210,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/textSingletonSummary"
+                    android:id="@+id/textFacadeSummary"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -222,18 +220,18 @@
                     android:textColor="#0D47A1"
                     android:textStyle="bold"
                     android:text="Chưa có giao dịch nào."
-                    tools:text="Lịch khám #21 · Hồ sơ #18 · Hóa đơn #18" />
+                    tools:text="Cuộc hẹn #21 · Bệnh nhân #5 · Hóa đơn #18 ($100.00)" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    android:text="Nhật ký Singleton"
+                    android:text="Nhật ký Facade"
                     android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/textSingletonLog"
+                    android:id="@+id/textFacadeLog"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -243,7 +241,7 @@
                     android:fontFamily="monospace"
                     android:textSize="13sp"
                     android:lineSpacingExtra="4dp"
-                    tools:text="[12:00:00] Chưa có giao dịch nào." />
+                    tools:text="[12:00:00] Đang gọi Facade..." />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 

@@ -1,77 +1,114 @@
 package com.example.designpattern.patterns.builder;
 
-public class Patient {
-    private final String firstName;
-    private final String lastName;
-    private final String gender;
-    private final String dob;
-    private final String phone;
-    private final String email;
+import java.sql.Timestamp;
+import java.util.Date;
 
-    private Patient(Builder builder) {
-        this.firstName = builder.firstName;
-        this.lastName = builder.lastName;
-        this.gender = builder.gender;
-        this.dob = builder.dob;
-        this.phone = builder.phone;
-        this.email = builder.email;
+public class Patient {
+    private int patientId;
+    private String firstName;
+    private String lastName;
+    private Date dateOfBirth;
+    private String gender;
+    private String contactNumber;
+    private String address;
+    private String email;
+    private String medicalHistory;
+    private Timestamp createdAt;
+
+    public Patient () {
+
     }
 
-    public String getFirstName() { return firstName; }
-    public String getLastName() { return lastName; }
-    public String getGender() { return gender; }
-    public String getDob() { return dob; }
-    public String getPhone() { return phone; }
-    public String getEmail() { return email; }
+    public Patient (int patientId, String firstName, String lastName, Date dateOfBirth, String gender, String contactNumber, String address, String email, String medicalHistory) {
+        this.patientId = patientId;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.dateOfBirth = dateOfBirth;
+        this.gender = gender;
+        this.contactNumber = contactNumber;
+        this.address = address;
+        this.email = email;
+        this.medicalHistory = medicalHistory;
+    }
 
-    public static class Builder {
-        private String firstName;
-        private String lastName;
-        private String gender;
-        private String dob;
-        private String phone;
-        private String email;
+    public int getPatientId() {
+        return patientId;
+    }
 
-        public Builder() {}
+    public String getFirstName() {
+        return firstName;
+    }
 
-        public Builder setFirstName(String firstName) {
-            this.firstName = firstName;
-            return this;
-        }
+    public String getLastName() {
+        return lastName;
+    }
 
-        public Builder setLastName(String lastName) {
-            this.lastName = lastName;
-            return this;
-        }
+    public Date getDateOfBirth() {
+        return dateOfBirth;
+    }
 
-        public Builder setGender(String gender) {
-            this.gender = gender;
-            return this;
-        }
+    public String getGender() {
+        return gender;
+    }
 
-        public Builder setDob(String dob) {
-            this.dob = dob;
-            return this;
-        }
+    public String getContactNumber() {
+        return contactNumber;
+    }
 
-        public Builder setPhone(String phone) {
-            this.phone = phone;
-            return this;
-        }
+    public String getAddress() {
+        return address;
+    }
 
-        public Builder setEmail(String email) {
-            this.email = email;
-            return this;
-        }
+    public String getEmail() {
+        return email;
+    }
 
-        public Patient build() {
-            if (firstName == null || firstName.trim().isEmpty()) {
-                throw new IllegalStateException("Patient First Name is required");
-            }
-            if (lastName == null || lastName.trim().isEmpty()) {
-                throw new IllegalStateException("Patient Last Name is required");
-            }
-            return new Patient(this);
-        }
+    public String getMedicalHistory() {
+        return medicalHistory;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setPatientId(int patientId) {
+        this.patientId = patientId;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setDateOfBirth(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public void setContactNumber(String contactNumber) {
+        this.contactNumber = contactNumber;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setMedicalHistory(String medicalHistory) {
+        this.medicalHistory = medicalHistory;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
     }
 }
+

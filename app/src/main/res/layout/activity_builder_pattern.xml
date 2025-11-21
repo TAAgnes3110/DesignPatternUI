@@ -2,12 +2,12 @@
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/commandRoot"
+    android:id="@+id/builderRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/colorSurface"
     android:fillViewport="true"
-    tools:context=".CommandPatternActivity">
+    tools:context=".BuilderPatternActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -32,21 +32,17 @@
                 app:tint="@color/material_dynamic_primary10" />
 
             <TextView
+                android:id="@+id/header_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Command Pattern"
+                android:text="Builder Pattern"
                 android:textAppearance="@style/TextAppearance.Material3.DisplaySmall"
                 android:textColor="@color/material_dynamic_primary10"
                 android:textStyle="bold"
                 android:layout_marginStart="8dp" />
         </LinearLayout>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Mỗi thao tác (thêm, cập nhật, xem danh sách) được đóng gói thành một Command riêng biệt. Bạn có thể xếp nhiều lệnh rồi chạy một lúc để xem rõ tác động lên database."
-            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-            android:alpha="0.8" />
+
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
@@ -72,13 +68,6 @@
                     android:textColor="@color/material_dynamic_primary10"
                     android:textStyle="bold" />
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Dữ liệu này được dùng để tạo lệnh Insert/Update."
-                    android:textAppearance="@style/TextAppearance.Material3.BodySmall" />
-
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -87,10 +76,9 @@
                     android:hint="Họ">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/inputCommandLastName"
+                        android:id="@+id/inputBuilderLastName"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Vu Tuan" />
+                        android:layout_height="wrap_content" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -101,10 +89,9 @@
                     android:hint="Tên">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/inputCommandFirstName"
+                        android:id="@+id/inputBuilderFirstName"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Kiet" />
+                        android:layout_height="wrap_content" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <LinearLayout
@@ -123,11 +110,10 @@
                         android:hint="Giới tính (M/F)">
 
                         <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/inputCommandGender"
+                            android:id="@+id/inputBuilderGender"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:maxLength="1"
-                            android:text="M" />
+                            android:maxLength="1" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -135,13 +121,12 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="2"
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                        android:hint="Ngày sinh">
+                        android:hint="Ngày sinh (yyyy-MM-dd)">
 
                         <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/inputCommandDob"
+                            android:id="@+id/inputBuilderDob"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="1995-02-02" />
+                            android:layout_height="wrap_content" />
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
 
@@ -153,10 +138,9 @@
                     android:hint="Số điện thoại">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/inputCommandPhone"
+                        android:id="@+id/inputBuilderPhone"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="0936992346" />
+                        android:layout_height="wrap_content" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -164,13 +148,12 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                    android:text="Email">
+                    android:hint="Email">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/inputCommandEmail"
+                        android:id="@+id/inputBuilderEmail"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="taagnes3110@gmail.com" />
+                        android:layout_height="wrap_content" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -178,15 +161,29 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                    android:hint="ID bệnh nhân (để cập nhật)">
+                    android:hint="Địa chỉ">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/inputCommandPatientId"
+                        android:id="@+id/inputBuilderAddress"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:hint="Tiền sử bệnh">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/inputBuilderHistory"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="number"
-                        android:text="1" />
+                        android:inputType="textMultiLine"
+                        android:minLines="2" />
                 </com.google.android.material.textfield.TextInputLayout>
+
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -207,18 +204,10 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Hàng đợi Command"
+                    android:text="Thao tác"
                     android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
                     android:textColor="@color/material_dynamic_primary10"
                     android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/textCommandQueue"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Đang có 0 command chờ thực thi"
-                    android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -228,31 +217,12 @@
                     android:orientation="horizontal">
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/buttonQueueInsert"
-                        android:layout_width="0dp"
+                        android:id="@+id/buttonBuilderInsert"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="8dp"
-                        android:layout_weight="1"
-                        android:text="Thêm (Queue)"
-                        app:backgroundTint="@color/material_dynamic_primary10" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/buttonQueueUpdate"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:layout_weight="1"
-                        android:text="Sửa (Queue)"
+                        android:text="Tạo &amp; Lưu (Builder)"
                         app:backgroundTint="@color/material_dynamic_primary10" />
                 </LinearLayout>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/buttonExecuteQueue"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Chạy toàn bộ hàng đợi"
-                    style="@style/Widget.Material3.Button.TonalButton" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/buttonFetchRecent"
@@ -289,7 +259,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/textCommandData"
+                    android:id="@+id/textBuilderData"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -310,7 +280,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/textCommandLog"
+                    android:id="@+id/textBuilderLog"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"

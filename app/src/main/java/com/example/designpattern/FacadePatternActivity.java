@@ -1,144 +1,149 @@
 package com.example.designpattern;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.text.TextUtils;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
-import com.example.designpattern.patterns.facade.HospitalSystemFacade;
-import com.example.designpattern.patterns.facade.VisitResult;
-import com.google.android.material.button.MaterialButton;
+import com.example.designpattern.data.DatabaseConnectionFactory;
+import com.example.designpattern.patterns.builder.Patient;
+import com.example.designpattern.patterns.facade.*;
 import com.google.android.material.textfield.TextInputEditText;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.sql.Date;
+import java.sql.Time;
+import java.util.List;
 
 public class FacadePatternActivity extends AppCompatActivity {
 
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
-    private final Handler handler = new Handler(Looper.getMainLooper());
+  private HospitalFacade facade;
+  private TextInputEditText inputPatientId, inputDoctorId, inputDate, inputTime, inputAmount;
+  private TextView textLog, textSummary;
 
-    private HospitalSystemFacade facade;
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_facade_pattern);
 
-    private TextInputEditText inputPatientId;
-    private TextInputEditText inputDoctorId;
-    private TextInputEditText inputDate;
-    private TextInputEditText inputTime;
-    private TextInputEditText inputDiagnosis;
-    private TextInputEditText inputAmount;
-    private TextView textLog;
-    private TextView textSummary;
+    DatabaseConnectionFactory dbFactory = DatabaseConnectionFactory.fromConfig();
+    facade = new HospitalFacade(
+        new PatientDAOImpl(dbFactory),
+        new AppointmentDAOImpl(dbFactory),
+        new BillingDAOImpl(dbFactory),
+        new DoctorDAOImpl(dbFactory));
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_singleton_pattern);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.singletonRoot), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+    initViews();
+    setupEvents();
+  }
+
+  private void initViews() {
+    inputPatientId = findViewById(R.id.inputFacadePatientId);
+    inputDoctorId = findViewById(R.id.inputFacadeDoctorId);
+    inputDate = findViewById(R.id.inputFacadeDate);
+    inputTime = findViewById(R.id.inputFacadeTime);
+    inputAmount = findViewById(R.id.inputFacadeAmount);
+    textLog = findViewById(R.id.textFacadeLog);
+    textSummary = findViewById(R.id.textFacadeSummary);
+  }
+
+  private void setupEvents() {
+    findViewById(R.id.buttonBack).setOnClickListener(v -> finish());
+    findViewById(R.id.buttonFacadeSchedule).setOnClickListener(v -> xuLyDatLich());
+    inputPatientId.setOnClickListener(v -> hienDialogChonBenhNhan());
+    inputDoctorId.setOnClickListener(v -> hienDialogChonBacSi());
+  }
+
+  private void hienDialogChonBenhNhan() {
+    new Thread(() -> {
+      List<Patient> patients = facade.getAllPatients();
+      String[] items = new String[patients.size()];
+      final int[] ids = new int[patients.size()];
+
+      for (int i = 0; i < patients.size(); i++) {
+        Patient p = patients.get(i);
+        items[i] = String.format("#%d - %s %s", p.getPatientId(), p.getLastName(), p.getFirstName());
+        ids[i] = p.getPatientId();
+      }
+
+      runOnUiThread(() -> showDialog("Chọn Bệnh nhân", items, ids, inputPatientId));
+    }).start();
+  }
+
+  private void hienDialogChonBacSi() {
+    new Thread(() -> {
+      List<Doctor> doctors = facade.getAllDoctors();
+      String[] items = new String[doctors.size()];
+      final int[] ids = new int[doctors.size()];
+
+      for (int i = 0; i < doctors.size(); i++) {
+        Doctor d = doctors.get(i);
+        items[i] = String.format("#%d - %s %s (%s)", d.getDoctorId(), d.getLastName(), d.getFirstName(),
+            d.getSpecialty());
+        ids[i] = d.getDoctorId();
+      }
+
+      runOnUiThread(() -> showDialog("Chọn Bác sĩ", items, ids, inputDoctorId));
+    }).start();
+  }
+
+  private void showDialog(String title, String[] items, int[] ids, TextInputEditText targetInput) {
+    if (items.length == 0) {
+      Toast.makeText(this, "Danh sách trống", Toast.LENGTH_SHORT).show();
+      return;
+    }
+    new AlertDialog.Builder(this)
+        .setTitle(title)
+        .setItems(items, (dialog, which) -> targetInput.setText(String.valueOf(ids[which])))
+        .show();
+  }
+
+  private void xuLyDatLich() {
+    new Thread(() -> {
+      try {
+        if (inputPatientId.getText().toString().isEmpty() || inputDoctorId.getText().toString().isEmpty()) {
+          throw new IllegalArgumentException("Vui lòng chọn Bệnh nhân và Bác sĩ");
+        }
+
+        int pId = Integer.parseInt(inputPatientId.getText().toString());
+        int dId = Integer.parseInt(inputDoctorId.getText().toString());
+        Date date = Date.valueOf(inputDate.getText().toString());
+        Time time = Time.valueOf(inputTime.getText().toString() + ":00");
+
+        String amountStr = inputAmount.getText().toString().trim();
+        if (amountStr.isEmpty())
+          amountStr = "0";
+        java.math.BigDecimal amount = new java.math.BigDecimal(amountStr);
+
+        // Facade Pattern: Client gọi 1 dòng, Facade lo hết (Đặt lịch -> Tạo hóa đơn)
+        Appointment appt = facade.bookAppointment(pId, dId, date, time);
+        Billing bill = facade.processBilling(appt.getAppointmentId(), amount);
+
+        capNhatKetQua(pId, dId, appt, bill);
+
+      } catch (Exception e) {
+        runOnUiThread(() -> {
+          Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+          textLog.setText("Lỗi: " + e.getMessage());
         });
+      }
+    }).start();
+  }
 
-        facade = new HospitalSystemFacade();
+  private void capNhatKetQua(int pId, int dId, Appointment appt, Billing bill) {
+    Patient p = (Patient) facade.getPatientRecords(pId).get("patient");
+    String tenBenhNhan = (p != null) ? p.getLastName() + " " + p.getFirstName() : "ID " + pId;
 
-        bindViews();
-        bindActions();
-    }
+    Doctor d = facade.getDoctorById(dId);
+    String tenBacSi = (d != null) ? d.getFullName() : "ID " + dId;
 
-    private void bindViews() {
-        inputPatientId = findViewById(R.id.inputSingletonPatientId);
-        inputDoctorId = findViewById(R.id.inputSingletonDoctorId);
-        inputDate = findViewById(R.id.inputSingletonDate);
-        inputTime = findViewById(R.id.inputSingletonTime);
-        inputDiagnosis = findViewById(R.id.inputSingletonDiagnosis);
-        inputAmount = findViewById(R.id.inputSingletonAmount);
-        textLog = findViewById(R.id.textSingletonLog);
-        textSummary = findViewById(R.id.textSingletonSummary);
-    }
-
-    private void bindActions() {
-        ImageButton backButton = findViewById(R.id.buttonBack);
-        backButton.setOnClickListener(v -> finish());
-
-        MaterialButton scheduleButton = findViewById(R.id.buttonSingletonSchedule);
-        scheduleButton.setOnClickListener(v -> runSchedule());
-    }
-
-    private void runSchedule() {
-        appendLog("Đang gọi Facade.scheduleVisit()...");
-        executor.execute(() -> {
-            try {
-                VisitResult result = facade.scheduleVisit(
-                        parseInt(inputPatientId, "patient id"),
-                        parseInt(inputDoctorId, "doctor id"),
-                        textOf(inputDate),
-                        textOf(inputTime),
-                        textOf(inputDiagnosis),
-                        parseDouble(inputAmount, "amount")
-                );
-                handler.post(() -> {
-                    textSummary.setText("Cuộc hẹn #" + result.appointmentId +
-                            " · Hồ sơ #" + result.recordId +
-                            " · Hóa đơn #" + result.billId);
-                    appendLog("Facade hoàn tất giao dịch: " + result);
-                });
-            } catch (Exception e) {
-                handler.post(() -> {
-                    appendLog("Lỗi từ Facade: " + e.getMessage());
-                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
-            }
-        });
-    }
-
-    private void appendLog(String message) {
-        String time = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
-        CharSequence existing = textLog.getText();
-        StringBuilder builder = new StringBuilder();
-        builder.append('[').append(time).append("] ").append(message).append('\n');
-        if (!TextUtils.isEmpty(existing)) {
-            builder.append(existing);
-        }
-        textLog.setText(builder.toString());
-    }
-
-    private String textOf(TextInputEditText editText) {
-        CharSequence cs = editText.getText();
-        return cs == null ? "" : cs.toString().trim();
-    }
-
-    private int parseInt(TextInputEditText editText, String label) {
-        try {
-            return Integer.parseInt(textOf(editText));
-        } catch (NumberFormatException ex) {
-            throw new IllegalArgumentException("Giá trị " + label + " không hợp lệ");
-        }
-    }
-
-    private double parseDouble(TextInputEditText editText, String label) {
-        try {
-            return Double.parseDouble(textOf(editText));
-        } catch (NumberFormatException ex) {
-            throw new IllegalArgumentException("Giá trị " + label + " không hợp lệ");
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        executor.shutdownNow();
-    }
+    runOnUiThread(() -> {
+      textSummary.setText(String.format(
+          "ĐẶT LỊCH THÀNH CÔNG\n\nBệnh nhân: %s\nBác sĩ: %s\nThời gian: %s %s\nHóa đơn #%d: $%s",
+          tenBenhNhan, tenBacSi, appt.getAppointmentDate(), appt.getAppointmentTime(), bill.getBillId(),
+          bill.getTotalAmount()));
+      textLog.setText(String.format("[%s] Giao dịch hoàn tất.", new java.util.Date()));
+    });
+  }
 }

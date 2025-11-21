@@ -55,7 +55,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical">
-                    
+
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -70,7 +70,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Quản lý khởi tạo đối tượng Bệnh Nhân (Patient) phức tạp. Tách biệt quá trình xây dựng object khỏi biểu diễn của nó."
+                    android:text="Giải quyết việc khởi tạo đối tượng Patient có quá nhiều thuộc tính tùy chọn."
                     android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                     android:lineSpacingMultiplier="1.2"
                     android:alpha="0.8" />
@@ -115,7 +115,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Cung cấp giao diện đơn giản cho hệ thống phức tạp. Ẩn đi sự phối hợp giữa Appointments, Records và Billing."
+                    android:text="Đơn giản hóa việc gọi chuỗi hành động phức tạp (Patient -> Appointment -> Billing)."
                     android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                     android:lineSpacingMultiplier="1.2"
                     android:alpha="0.8" />
