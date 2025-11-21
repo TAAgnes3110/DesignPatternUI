@@ -60,7 +60,6 @@ public class StandardPatientBuilder implements PatientBuilder {
 
   @Override
   public Patient build() {
-    // Validation: Đảm bảo các trường bắt buộc không null/rỗng
     if (this.patient.getFirstName() == null || this.patient.getFirstName().trim().isEmpty()) {
       throw new IllegalStateException("Tên không được để trống");
     }
@@ -77,7 +76,6 @@ public class StandardPatientBuilder implements PatientBuilder {
       throw new IllegalStateException("Số điện thoại không được để trống");
     }
 
-    // Tạo đối tượng Patient mới với các giá trị đã validate
     Patient builtPatient = new Patient();
     builtPatient.setFirstName(this.patient.getFirstName());
     builtPatient.setLastName(this.patient.getLastName());

@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.sql.Time;
 import java.sql.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class HospitalFacade {
@@ -36,7 +37,7 @@ public class HospitalFacade {
     return appointment;
   }
 
-  public Billing processBilling(int appointmentId, java.math.BigDecimal amount) {
+  public Billing processBilling(int appointmentId, BigDecimal amount) {
     Appointment appointment = appointmentDAO.findById(appointmentId);
     if (appointment == null) {
       throw new RuntimeException("Không tìm thấy cuộc hẹn với ID: " + appointmentId);
@@ -52,11 +53,11 @@ public class HospitalFacade {
     return records;
   }
 
-  public java.util.List<Patient> getAllPatients() {
+  public List<Patient> getAllPatients() {
     return patientDAO.findAll();
   }
 
-  public java.util.List<Doctor> getAllDoctors() {
+  public List<Doctor> getAllDoctors() {
     return doctorDAO.findAll();
   }
 

@@ -6,6 +6,8 @@ import com.example.designpattern.patterns.builder.Patient;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PatientDAOImpl implements PatientDAO {
   private final DatabaseConnectionFactory factory;
@@ -58,8 +60,8 @@ public class PatientDAOImpl implements PatientDAO {
   }
 
   @Override
-  public java.util.List<Patient> findAll() {
-    java.util.List<Patient> patients = new java.util.ArrayList<>();
+  public List<Patient> findAll() {
+    List<Patient> patients = new ArrayList<>();
     String sql = "SELECT patient_id, first_name, last_name FROM Patients ORDER BY patient_id DESC LIMIT 10";
     try (Connection conn = factory.newConnection();
         PreparedStatement stmt = conn.prepareStatement(sql);

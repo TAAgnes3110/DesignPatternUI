@@ -1,8 +1,6 @@
 package com.example.designpattern;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -12,16 +10,15 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.example.designpattern.data.DatabaseConnectionFactory;
+import com.example.designpattern.data.PatientDatabaseHelper;
 import com.example.designpattern.patterns.builder.*;
 import com.google.android.material.textfield.TextInputEditText;
 
-import java.sql.*;
+import java.sql.Date;
 
 public class BuilderPatternActivity extends AppCompatActivity {
 
-  private final Handler handler = new Handler(Looper.getMainLooper());
-  private DatabaseConnectionFactory factory;
+  private PatientDatabaseHelper dbHelper;
 
   private TextInputEditText inputFirstName, inputLastName, inputGender, inputDob, inputPhone, inputEmail;
   private TextView textLog, textDataPreview;
@@ -37,7 +34,7 @@ public class BuilderPatternActivity extends AppCompatActivity {
       return insets;
     });
 
-    factory = DatabaseConnectionFactory.fromConfig();
+    dbHelper = new PatientDatabaseHelper();
     initViews();
     setupClickListeners();
   }
@@ -55,34 +52,35 @@ public class BuilderPatternActivity extends AppCompatActivity {
 
   private void setupClickListeners() {
     findViewById(R.id.buttonBack).setOnClickListener(v -> finish());
-    findViewById(R.id.buttonBuilderInsert).setOnClickListener(v -> luuThongTinBenhNhan());
-    findViewById(R.id.buttonFetchRecent).setOnClickListener(v -> taiDanhSachBenhNhan());
+    findViewById(R.id.buttonBuilderInsert).setOnClickListener(v -> savePatient());
+    findViewById(R.id.buttonFetchRecent).setOnClickListener(v -> loadPatients());
   }
 
-  private void luuThongTinBenhNhan() {
+  private void savePatient() {
     try {
       PatientBuilder builder = new StandardPatientBuilder();
-      builder.setFirstName(layNoiDung(inputFirstName))
-          .setLastName(layNoiDung(inputLastName))
-          .setGender(layNoiDung(inputGender))
-          .setDateOfBirth(Date.valueOf(layNoiDung(inputDob)))
-          .setContactNumber(layNoiDung(inputPhone))
-          .setEmail(layNoiDung(inputEmail))
+      builder.setFirstName(getText(inputFirstName))
+          .setLastName(getText(inputLastName))
+          .setGender(getText(inputGender))
+          .setDateOfBirth(Date.valueOf(getText(inputDob)))
+          .setContactNumber(getText(inputPhone))
+          .setEmail(getText(inputEmail))
           .setAddress("Default Address")
           .setMedicalHistory("No history recorded");
 
       Patient patient = new PatientDirector(builder).buildPatient();
-      ghiLog("Builder: Đã tạo object Patient hợp lệ.");
+      log("Builder: Đã tạo object Patient hợp lệ.");
 
       new Thread(() -> {
         try {
-          String result = themVaoDatabase(patient);
-          handler.post(() -> {
-            ghiLog("DB: " + result);
-            taiDanhSachBenhNhan();
+          String result = dbHelper.addPatient(patient);
+
+          runOnUiThread(() -> {
+            log("DB: " + result);
+            loadPatients();
           });
         } catch (Exception e) {
-          handler.post(() -> ghiLog("Lỗi DB: " + e.getMessage()));
+          runOnUiThread(() -> log("Lỗi DB: " + e.getMessage()));
         }
       }).start();
 
@@ -93,55 +91,22 @@ public class BuilderPatternActivity extends AppCompatActivity {
     }
   }
 
-  private String themVaoDatabase(Patient p) throws Exception {
-    String sql = "INSERT INTO Patients (first_name, last_name, gender, date_of_birth, contact_number, email, address, medical_history) VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING patient_id";
-    try (Connection conn = factory.newConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-      stmt.setString(1, p.getFirstName());
-      stmt.setString(2, p.getLastName());
-      stmt.setString(3, p.getGender());
-      stmt.setDate(4, new Date(p.getDateOfBirth().getTime()));
-      stmt.setString(5, p.getContactNumber());
-      stmt.setString(6, p.getEmail());
-      stmt.setString(7, p.getAddress());
-      stmt.setString(8, p.getMedicalHistory());
-
-      try (ResultSet rs = stmt.executeQuery()) {
-        rs.next();
-        return "Đã insert thành công ID: " + rs.getInt(1);
-      }
-    }
-  }
-
-  private void taiDanhSachBenhNhan() {
-    ghiLog("Đang tải danh sách...");
+  private void loadPatients() {
     new Thread(() -> {
       try {
-        StringBuilder sb = new StringBuilder();
-        try (Connection conn = factory.newConnection();
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(
-                "SELECT patient_id, first_name, last_name, contact_number FROM Patients ORDER BY patient_id DESC LIMIT 5")) {
-          while (rs.next()) {
-            sb.append(
-                String.format("#%d %s %s (%s)\n", rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4)));
-          }
-        }
-        String result = sb.length() > 0 ? sb.toString() : "Chưa có dữ liệu.";
-        handler.post(() -> {
-          textDataPreview.setText(result);
-          ghiLog("Đã cập nhật danh sách.");
-        });
+        String result = dbHelper.getRecentPatients();
+        runOnUiThread(() -> textDataPreview.setText(result));
       } catch (Exception e) {
-        handler.post(() -> ghiLog("Lỗi tải danh sách: " + e.getMessage()));
+        runOnUiThread(() -> log("Lỗi tải danh sách: " + e.getMessage()));
       }
     }).start();
   }
 
-  private void ghiLog(String msg) {
-    textLog.setText(String.format("[%s] %s\n%s", new java.util.Date(), msg, textLog.getText()));
+  private void log(String msg) {
+    textLog.setText(msg + "\n" + textLog.getText());
   }
 
-  private String layNoiDung(TextInputEditText et) {
+  private String getText(TextInputEditText et) {
     return et.getText() == null ? "" : et.getText().toString().trim();
   }
 }

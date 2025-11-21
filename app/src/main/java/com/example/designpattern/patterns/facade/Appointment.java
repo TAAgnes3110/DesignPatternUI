@@ -29,7 +29,6 @@ public class Appointment {
     this.createdAt = new Timestamp(System.currentTimeMillis());
   }
 
-  // Constructor đầy đủ
   public Appointment(int appointmentId, int patientId, int doctorId, Date appointmentDate, Time appointmentTime,
       String purpose, String status) {
     this.appointmentId = appointmentId;

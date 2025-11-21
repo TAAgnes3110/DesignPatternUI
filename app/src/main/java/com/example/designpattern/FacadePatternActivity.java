@@ -12,6 +12,7 @@ import com.example.designpattern.patterns.builder.Patient;
 import com.example.designpattern.patterns.facade.*;
 import com.google.android.material.textfield.TextInputEditText;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Time;
 import java.util.List;
@@ -50,12 +51,12 @@ public class FacadePatternActivity extends AppCompatActivity {
 
   private void setupEvents() {
     findViewById(R.id.buttonBack).setOnClickListener(v -> finish());
-    findViewById(R.id.buttonFacadeSchedule).setOnClickListener(v -> xuLyDatLich());
-    inputPatientId.setOnClickListener(v -> hienDialogChonBenhNhan());
-    inputDoctorId.setOnClickListener(v -> hienDialogChonBacSi());
+    findViewById(R.id.buttonFacadeSchedule).setOnClickListener(v -> bookAppointment());
+    inputPatientId.setOnClickListener(v -> selectPatient());
+    inputDoctorId.setOnClickListener(v -> selectDoctor());
   }
 
-  private void hienDialogChonBenhNhan() {
+  private void selectPatient() {
     new Thread(() -> {
       List<Patient> patients = facade.getAllPatients();
       String[] items = new String[patients.size()];
@@ -71,7 +72,7 @@ public class FacadePatternActivity extends AppCompatActivity {
     }).start();
   }
 
-  private void hienDialogChonBacSi() {
+  private void selectDoctor() {
     new Thread(() -> {
       List<Doctor> doctors = facade.getAllDoctors();
       String[] items = new String[doctors.size()];
@@ -99,7 +100,7 @@ public class FacadePatternActivity extends AppCompatActivity {
         .show();
   }
 
-  private void xuLyDatLich() {
+  private void bookAppointment() {
     new Thread(() -> {
       try {
         if (inputPatientId.getText().toString().isEmpty() || inputDoctorId.getText().toString().isEmpty()) {
@@ -114,13 +115,12 @@ public class FacadePatternActivity extends AppCompatActivity {
         String amountStr = inputAmount.getText().toString().trim();
         if (amountStr.isEmpty())
           amountStr = "0";
-        java.math.BigDecimal amount = new java.math.BigDecimal(amountStr);
+        BigDecimal amount = new BigDecimal(amountStr);
 
-        // Facade Pattern: Client gọi 1 dòng, Facade lo hết (Đặt lịch -> Tạo hóa đơn)
         Appointment appt = facade.bookAppointment(pId, dId, date, time);
         Billing bill = facade.processBilling(appt.getAppointmentId(), amount);
 
-        capNhatKetQua(pId, dId, appt, bill);
+        showResult(pId, dId, appt, bill);
 
       } catch (Exception e) {
         runOnUiThread(() -> {
@@ -131,19 +131,19 @@ public class FacadePatternActivity extends AppCompatActivity {
     }).start();
   }
 
-  private void capNhatKetQua(int pId, int dId, Appointment appt, Billing bill) {
+  private void showResult(int pId, int dId, Appointment appt, Billing bill) {
     Patient p = (Patient) facade.getPatientRecords(pId).get("patient");
-    String tenBenhNhan = (p != null) ? p.getLastName() + " " + p.getFirstName() : "ID " + pId;
+    String patientName = (p != null) ? p.getLastName() + " " + p.getFirstName() : "ID " + pId;
 
     Doctor d = facade.getDoctorById(dId);
-    String tenBacSi = (d != null) ? d.getFullName() : "ID " + dId;
+    String doctorName = (d != null) ? d.getFullName() : "ID " + dId;
 
     runOnUiThread(() -> {
       textSummary.setText(String.format(
           "ĐẶT LỊCH THÀNH CÔNG\n\nBệnh nhân: %s\nBác sĩ: %s\nThời gian: %s %s\nHóa đơn #%d: $%s",
-          tenBenhNhan, tenBacSi, appt.getAppointmentDate(), appt.getAppointmentTime(), bill.getBillId(),
+          patientName, doctorName, appt.getAppointmentDate(), appt.getAppointmentTime(), bill.getBillId(),
           bill.getTotalAmount()));
-      textLog.setText(String.format("[%s] Giao dịch hoàn tất.", new java.util.Date()));
+      textLog.setText("Giao dịch hoàn tất.");
     });
   }
 }
