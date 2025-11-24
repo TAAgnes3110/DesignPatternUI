@@ -11,10 +11,22 @@ public class Billing {
         this.patientId = patientId;
         this.totalAmount = totalAmount;
     }
-    public int getBillId() { return billId; }
-    public int getPatientId() { return patientId; }
-    public BigDecimal getTotalAmount() { return totalAmount; }
-    public void setBillId(int billId) { this.billId = billId; }
-    public void setPatientId(int patientId) { this.patientId = patientId; }
-    public void setTotalAmount(BigDecimal totalAmount) { this.totalAmount = totalAmount; }
+    public int getBillId() {
+      return billId;
+    }
+    public int getPatientId() {
+      return patientId;
+    }
+    public BigDecimal getTotalAmount() {
+      return totalAmount;
+    }
+    public void setBillId(int billId) {
+      this.billId = billId;
+    }
+    public void setPatientId(int patientId) {
+      this.patientId = patientId;
+    }
+    public void setTotalAmount(BigDecimal totalAmount) {
+      this.totalAmount = totalAmount;
+    }
 }
