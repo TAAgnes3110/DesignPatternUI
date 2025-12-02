@@ -18,119 +18,45 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="Design Patterns"
+            android:layout_marginTop="32dp"
+            android:text="Kết Thúc Học Phần"
             android:textAppearance="@style/TextAppearance.Material3.DisplaySmall"
             android:textColor="@color/material_dynamic_primary10"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:gravity="center" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:layout_marginBottom="32dp"
-            android:text="Các mẫu thiết kế trong ứng dụng quản lý bệnh viện"
-            android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+            android:layout_marginBottom="48dp"
+            android:text="Demo 2 Form Nhập Dữ Liệu"
+            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+            android:gravity="center"
             android:alpha="0.7" />
 
-        <!-- Builder Pattern Card -->
-        <com.google.android.material.card.MaterialCardView
+        <!-- Form 1 Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonForm1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
-            app:cardCornerRadius="24dp"
-            app:cardElevation="6dp"
-            app:strokeColor="@color/material_dynamic_primary10"
-            app:strokeWidth="1dp"
-            app:cardBackgroundColor="#E3F2FD">
+            android:text="Form 1: Nhập 1 Bảng (Builder)"
+            android:textSize="18sp"
+            android:padding="16dp"
+            app:cornerRadius="12dp"
+            app:backgroundTint="@color/material_dynamic_primary10" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="24dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Builder Pattern"
-                        android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
-                        android:textColor="@color/material_dynamic_primary10"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Giải quyết việc khởi tạo đối tượng Patient có quá nhiều thuộc tính tùy chọn."
-                    android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                    android:lineSpacingMultiplier="1.2"
-                    android:alpha="0.8" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/buttonCommandPattern"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:text="Xem Demo Builder"
-                    app:backgroundTint="@color/material_dynamic_primary10"
-                    android:paddingTop="12dp"
-                    android:paddingBottom="12dp" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- Facade Pattern Card -->
-        <com.google.android.material.card.MaterialCardView
+        <!-- Form 2 Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonForm2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="24dp"
-            app:cardElevation="6dp"
-            app:strokeColor="@color/material_dynamic_primary10"
-            app:strokeWidth="1dp"
-            app:cardBackgroundColor="#F3E5F5">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="24dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Facade Pattern"
-                    android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
-                    android:textColor="#7B1FA2"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Đơn giản hóa việc gọi chuỗi hành động phức tạp (Patient -> Appointment -> Billing)."
-                    android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                    android:lineSpacingMultiplier="1.2"
-                    android:alpha="0.8" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/buttonSingletonPattern"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:text="Xem Demo Facade"
-                    app:backgroundTint="#7B1FA2"
-                    android:paddingTop="12dp"
-                    android:paddingBottom="12dp" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+            android:text="Form 2: Nhập Nhiều Bảng (Facade)"
+            android:textSize="18sp"
+            android:padding="16dp"
+            app:cornerRadius="12dp"
+            app:backgroundTint="#7B1FA2" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

@@ -12,16 +12,21 @@ import com.example.designpattern.patterns.builder.Patient;
 import com.example.designpattern.patterns.facade.*;
 import com.google.android.material.textfield.TextInputEditText;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
+import java.util.Calendar;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Time;
+import java.util.ArrayList;
 import java.util.List;
 
 public class FacadePatternActivity extends AppCompatActivity {
 
   private HospitalFacade facade;
-  private TextInputEditText inputPatientId, inputDoctorId, inputDate, inputTime, inputAmount;
+  private TextInputEditText inputPatientId, inputDoctorId, inputDate, inputTime, inputAmount, inputServices;
   private TextView textLog, textSummary;
+  private List<Service> selectedServices = new ArrayList<>();
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +38,9 @@ public class FacadePatternActivity extends AppCompatActivity {
         new PatientDAOImpl(dbFactory),
         new AppointmentDAOImpl(dbFactory),
         new BillingDAOImpl(dbFactory),
-        new DoctorDAOImpl(dbFactory));
+        new DoctorDAOImpl(dbFactory),
+        new ServiceDAOImpl(dbFactory),
+        new AppointmentServiceDAOImpl(dbFactory));
 
     initViews();
     setupEvents();
@@ -44,6 +51,7 @@ public class FacadePatternActivity extends AppCompatActivity {
     inputDoctorId = findViewById(R.id.inputFacadeDoctorId);
     inputDate = findViewById(R.id.inputFacadeDate);
     inputTime = findViewById(R.id.inputFacadeTime);
+    inputServices = findViewById(R.id.inputFacadeServices);
     inputAmount = findViewById(R.id.inputFacadeAmount);
     textLog = findViewById(R.id.textFacadeLog);
     textSummary = findViewById(R.id.textFacadeSummary);
@@ -54,6 +62,32 @@ public class FacadePatternActivity extends AppCompatActivity {
     findViewById(R.id.buttonFacadeSchedule).setOnClickListener(v -> bookAppointment());
     inputPatientId.setOnClickListener(v -> selectPatient());
     inputDoctorId.setOnClickListener(v -> selectDoctor());
+    inputServices.setOnClickListener(v -> selectServices());
+
+    // Date & Time Pickers
+    inputDate.setOnClickListener(v -> showDatePicker());
+    inputDate.setFocusable(false);
+    inputDate.setClickable(true);
+
+    inputTime.setOnClickListener(v -> showTimePicker());
+    inputTime.setFocusable(false);
+    inputTime.setClickable(true);
+  }
+
+  private void showDatePicker() {
+    Calendar calendar = Calendar.getInstance();
+    new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
+      String dateStr = String.format("%d-%02d-%02d", year, month + 1, dayOfMonth);
+      inputDate.setText(dateStr);
+    }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
+  }
+
+  private void showTimePicker() {
+    Calendar calendar = Calendar.getInstance();
+    new TimePickerDialog(this, (view, hourOfDay, minute) -> {
+      String timeStr = String.format("%02d:%02d", hourOfDay, minute);
+      inputTime.setText(timeStr);
+    }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show();
   }
 
   private void selectPatient() {
@@ -89,6 +123,50 @@ public class FacadePatternActivity extends AppCompatActivity {
     }).start();
   }
 
+  private void selectServices() {
+    new Thread(() -> {
+      List<Service> services = facade.getAllServices();
+      String[] items = new String[services.size()];
+      boolean[] checkedItems = new boolean[services.size()];
+
+      for (int i = 0; i < services.size(); i++) {
+        items[i] = String.format("%s ($%s)", services.get(i).getServiceName(), services.get(i).getPrice());
+      }
+
+      runOnUiThread(() -> {
+        new AlertDialog.Builder(this)
+            .setTitle("Chọn Dịch vụ")
+            .setMultiChoiceItems(items, checkedItems, (dialog, which, isChecked) -> {
+              if (isChecked) {
+                selectedServices.add(services.get(which));
+              } else {
+                selectedServices.remove(services.get(which));
+              }
+              updateTotalAmount();
+            })
+            .setPositiveButton("OK", (dialog, which) -> {
+              StringBuilder sb = new StringBuilder();
+              for (Service s : selectedServices) {
+                if (sb.length() > 0)
+                  sb.append(", ");
+                sb.append(s.getServiceName());
+              }
+              inputServices.setText(sb.toString());
+            })
+            .show();
+      });
+    }).start();
+  }
+
+  private void updateTotalAmount() {
+    BigDecimal total = BigDecimal.ZERO;
+    for (Service s : selectedServices) {
+      total = total.add(s.getPrice());
+    }
+    BigDecimal finalTotal = total;
+    runOnUiThread(() -> inputAmount.setText(finalTotal.toString()));
+  }
+
   private void showDialog(String title, String[] items, int[] ids, TextInputEditText targetInput) {
     if (items.length == 0) {
       Toast.makeText(this, "Danh sách trống", Toast.LENGTH_SHORT).show();
@@ -103,8 +181,21 @@ public class FacadePatternActivity extends AppCompatActivity {
   private void bookAppointment() {
     new Thread(() -> {
       try {
-        if (inputPatientId.getText().toString().isEmpty() || inputDoctorId.getText().toString().isEmpty()) {
-          throw new IllegalArgumentException("Vui lòng chọn Bệnh nhân và Bác sĩ");
+        if (inputPatientId.getText().toString().isEmpty()) {
+          runOnUiThread(() -> inputPatientId.setError("Chọn bệnh nhân"));
+          return;
+        }
+        if (inputDoctorId.getText().toString().isEmpty()) {
+          runOnUiThread(() -> inputDoctorId.setError("Chọn bác sĩ"));
+          return;
+        }
+        if (inputDate.getText().toString().isEmpty()) {
+          runOnUiThread(() -> inputDate.setError("Chọn ngày"));
+          return;
+        }
+        if (inputTime.getText().toString().isEmpty()) {
+          runOnUiThread(() -> inputTime.setError("Chọn giờ"));
+          return;
         }
 
         int pId = Integer.parseInt(inputPatientId.getText().toString());
@@ -118,6 +209,12 @@ public class FacadePatternActivity extends AppCompatActivity {
         BigDecimal amount = new BigDecimal(amountStr);
 
         Appointment appt = facade.bookAppointment(pId, dId, date, time);
+
+        // Add services
+        for (Service s : selectedServices) {
+          facade.addServiceToAppointment(appt.getAppointmentId(), s, 1);
+        }
+
         Billing bill = facade.processBilling(appt.getAppointmentId(), amount);
 
         showResult(pId, dId, appt, bill);

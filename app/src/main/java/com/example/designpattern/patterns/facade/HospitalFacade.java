@@ -14,13 +14,17 @@ public class HospitalFacade {
   private final AppointmentDAO appointmentDAO;
   private final BillingDAO billingDAO;
   private final DoctorDAO doctorDAO;
+  private final ServiceDAO serviceDAO;
+  private final AppointmentServiceDAO appointmentServiceDAO;
 
   public HospitalFacade(PatientDAO patientDAO, AppointmentDAO appointmentDAO, BillingDAO billingDAO,
-      DoctorDAO doctorDAO) {
+      DoctorDAO doctorDAO, ServiceDAO serviceDAO, AppointmentServiceDAO appointmentServiceDAO) {
     this.patientDAO = patientDAO;
     this.appointmentDAO = appointmentDAO;
     this.billingDAO = billingDAO;
     this.doctorDAO = doctorDAO;
+    this.serviceDAO = serviceDAO;
+    this.appointmentServiceDAO = appointmentServiceDAO;
   }
 
   public Patient registerPatient(Map<String, Object> patientData) {
@@ -35,6 +39,12 @@ public class HospitalFacade {
     Appointment appointment = new Appointment(0, patientId, doctorId, date, time);
     appointmentDAO.save(appointment);
     return appointment;
+  }
+
+  public void addServiceToAppointment(int appointmentId, Service service, int quantity) {
+    AppointmentService as = new AppointmentService(0, appointmentId, service.getServiceId(), quantity,
+        service.getPrice());
+    appointmentServiceDAO.save(as);
   }
 
   public Billing processBilling(int appointmentId, BigDecimal amount) {
@@ -59,6 +69,10 @@ public class HospitalFacade {
 
   public List<Doctor> getAllDoctors() {
     return doctorDAO.findAll();
+  }
+
+  public List<Service> getAllServices() {
+    return serviceDAO.findAll();
   }
 
   public Doctor getDoctorById(int id) {

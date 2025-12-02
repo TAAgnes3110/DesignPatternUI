@@ -24,13 +24,13 @@ public class MainActivity extends AppCompatActivity {
       return insets;
     });
 
-    MaterialButton builderButton = findViewById(R.id.buttonCommandPattern);
-    MaterialButton facadeButton = findViewById(R.id.buttonSingletonPattern);
+    MaterialButton form1Button = findViewById(R.id.buttonForm1);
+    MaterialButton form2Button = findViewById(R.id.buttonForm2);
 
-    builderButton.setOnClickListener(v -> startActivity(
+    form1Button.setOnClickListener(v -> startActivity(
         new Intent(this, BuilderPatternActivity.class)));
 
-    facadeButton.setOnClickListener(v -> startActivity(
+    form2Button.setOnClickListener(v -> startActivity(
         new Intent(this, FacadePatternActivity.class)));
   }
 }

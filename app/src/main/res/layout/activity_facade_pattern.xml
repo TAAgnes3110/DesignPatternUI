@@ -36,7 +36,7 @@
                 android:id="@+id/header_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Facade Pattern"
+                android:text="Form 2: Nhập Nhiều Bảng (Facade)"
                 android:textAppearance="@style/TextAppearance.Material3.DisplaySmall"
                 android:textColor="@color/material_dynamic_primary10"
                 android:textStyle="bold"
@@ -159,6 +159,24 @@
                             android:inputType="time" />
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
+
+                <!-- Services Selection -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:hint="Dịch vụ">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/inputFacadeServices"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"
+                        android:focusable="false"
+                        android:clickable="true"
+                        android:drawableEnd="@android:drawable/arrow_down_float" />
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- Amount (New Field) -->
                 <com.google.android.material.textfield.TextInputLayout

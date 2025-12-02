@@ -14,14 +14,23 @@ import com.example.designpattern.data.PatientDatabaseHelper;
 import com.example.designpattern.patterns.builder.*;
 import com.google.android.material.textfield.TextInputEditText;
 
+import android.app.DatePickerDialog;
+import android.net.Uri;
+import android.widget.ImageView;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import java.util.Calendar;
 import java.sql.Date;
 
 public class BuilderPatternActivity extends AppCompatActivity {
 
   private PatientDatabaseHelper dbHelper;
 
-  private TextInputEditText inputFirstName, inputLastName, inputGender, inputDob, inputPhone, inputEmail;
+  private TextInputEditText inputFirstName, inputLastName, inputGender, inputDob, inputPhone, inputEmail, inputHistory;
   private TextView textLog, textDataPreview;
+  private ImageView imageAvatar;
+  private ActivityResultLauncher<String> pickImageLauncher;
+  private Uri selectedImageUri;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +44,15 @@ public class BuilderPatternActivity extends AppCompatActivity {
     });
 
     dbHelper = new PatientDatabaseHelper();
+
+    pickImageLauncher = registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
+      if (uri != null) {
+        selectedImageUri = uri;
+        imageAvatar.setImageURI(uri);
+        log("Đã chọn ảnh: " + uri.getPath());
+      }
+    });
+
     initViews();
     setupClickListeners();
   }
@@ -46,18 +64,38 @@ public class BuilderPatternActivity extends AppCompatActivity {
     inputDob = findViewById(R.id.inputBuilderDob);
     inputPhone = findViewById(R.id.inputBuilderPhone);
     inputEmail = findViewById(R.id.inputBuilderEmail);
+    inputHistory = findViewById(R.id.inputBuilderHistory);
     textLog = findViewById(R.id.textBuilderLog);
     textDataPreview = findViewById(R.id.textBuilderData);
+    imageAvatar = findViewById(R.id.imageBuilderAvatar);
   }
 
   private void setupClickListeners() {
     findViewById(R.id.buttonBack).setOnClickListener(v -> finish());
     findViewById(R.id.buttonBuilderInsert).setOnClickListener(v -> savePatient());
     findViewById(R.id.buttonFetchRecent).setOnClickListener(v -> loadPatients());
+
+    inputDob.setOnClickListener(v -> showDatePicker());
+    inputDob.setFocusable(false);
+    inputDob.setClickable(true);
+
+    // Image Picker
+    findViewById(R.id.buttonBuilderSelectImage).setOnClickListener(v -> pickImageLauncher.launch("image/*"));
+  }
+
+  private void showDatePicker() {
+    Calendar calendar = Calendar.getInstance();
+    new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
+      String dateStr = String.format("%d-%02d-%02d", year, month + 1, dayOfMonth);
+      inputDob.setText(dateStr);
+    }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
   }
 
   private void savePatient() {
     try {
+      if (!validateInputs())
+        return;
+
       PatientBuilder builder = new StandardPatientBuilder();
       builder.setFirstName(getText(inputFirstName))
           .setLastName(getText(inputLastName))
@@ -65,8 +103,8 @@ public class BuilderPatternActivity extends AppCompatActivity {
           .setDateOfBirth(Date.valueOf(getText(inputDob)))
           .setContactNumber(getText(inputPhone))
           .setEmail(getText(inputEmail))
-          .setAddress("Default Address")
-          .setMedicalHistory("No history recorded");
+          .setAddress(getText(findViewById(R.id.inputBuilderAddress)))
+          .setMedicalHistory(getText(inputHistory));
 
       Patient patient = new PatientDirector(builder).buildPatient();
       log("Builder: Đã tạo object Patient hợp lệ.");
@@ -108,5 +146,26 @@ public class BuilderPatternActivity extends AppCompatActivity {
 
   private String getText(TextInputEditText et) {
     return et.getText() == null ? "" : et.getText().toString().trim();
+  }
+
+  private boolean validateInputs() {
+    boolean isValid = true;
+    if (getText(inputFirstName).isEmpty()) {
+      inputFirstName.setError("Bắt buộc");
+      isValid = false;
+    }
+    if (getText(inputLastName).isEmpty()) {
+      inputLastName.setError("Bắt buộc");
+      isValid = false;
+    }
+    if (getText(inputDob).isEmpty()) {
+      inputDob.setError("Bắt buộc");
+      isValid = false;
+    }
+    if (getText(inputPhone).isEmpty()) {
+      inputPhone.setError("Bắt buộc");
+      isValid = false;
+    }
+    return isValid;
   }
 }
