@@ -16,10 +16,19 @@ public class BillingDAOImpl implements BillingDAO {
 
   @Override
   public boolean save(Billing billing) {
-    String sql = "INSERT INTO Billing (patient_id, total_amount) VALUES (?, ?) RETURNING bill_id";
-    try (Connection conn = dbFactory.newConnection();
-        PreparedStatement stmt = conn.prepareStatement(sql)) {
-      stmt.setInt(1, billing.getPatientId());
+    try (Connection conn = dbFactory.newConnection()) {
+      return save(billing, conn);
+    } catch (SQLException e) {
+      e.printStackTrace();
+      return false;
+    }
+  }
+
+  @Override
+  public boolean save(Billing billing, Connection conn) {
+    String sql = "INSERT INTO Billing (appointment_id, total_amount) VALUES (?, ?) RETURNING bill_id";
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+      stmt.setInt(1, billing.getAppointmentId());
       stmt.setBigDecimal(2, billing.getTotalAmount());
 
       try (ResultSet rs = stmt.executeQuery()) {
@@ -45,7 +54,7 @@ public class BillingDAOImpl implements BillingDAO {
         if (rs.next()) {
           return new Billing(
               rs.getInt("bill_id"),
-              rs.getInt("patient_id"),
+              rs.getInt("appointment_id"),
               rs.getBigDecimal("total_amount"));
         }
       }

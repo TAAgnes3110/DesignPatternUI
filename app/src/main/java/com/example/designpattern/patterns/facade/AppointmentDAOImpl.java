@@ -15,9 +15,18 @@ public class AppointmentDAOImpl implements AppointmentDAO {
 
   @Override
   public boolean save(Appointment appointment) {
-    String sql = "INSERT INTO Appointments (patient_id, doctor_id, appointment_date, appointment_time) VALUES (?, ?, ?, ?) RETURNING appointment_id";
-    try (Connection conn = dbFactory.newConnection();
-        PreparedStatement stmt = conn.prepareStatement(sql)) {
+    try (Connection conn = dbFactory.newConnection()) {
+      return save(appointment, conn);
+    } catch (SQLException e) {
+      e.printStackTrace();
+      return false;
+    }
+  }
+
+  @Override
+  public boolean save(Appointment appointment, Connection conn) {
+    String sql = "INSERT INTO Appointments (patient_id, doctor_id, appointment_date, appointment_time, purpose) VALUES (?, ?, ?, ?, ?) RETURNING appointment_id";
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
       stmt.setInt(1, appointment.getPatientId());
       stmt.setInt(2, appointment.getDoctorId());
 
@@ -28,6 +37,7 @@ public class AppointmentDAOImpl implements AppointmentDAO {
       }
 
       stmt.setTime(4, appointment.getAppointmentTime());
+      stmt.setString(5, appointment.getPurpose());
 
       try (ResultSet rs = stmt.executeQuery()) {
         if (rs.next()) {
@@ -56,6 +66,8 @@ public class AppointmentDAOImpl implements AppointmentDAO {
           appointment.setDoctorId(rs.getInt("doctor_id"));
           appointment.setAppointmentDate(rs.getDate("appointment_date"));
           appointment.setAppointmentTime(rs.getTime("appointment_time"));
+          appointment.setPurpose(rs.getString("purpose"));
+          appointment.setStatus(rs.getString("status"));
           return appointment;
         }
       }

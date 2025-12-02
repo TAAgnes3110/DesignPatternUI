@@ -16,9 +16,17 @@ public class AppointmentServiceDAOImpl implements AppointmentServiceDAO {
 
   @Override
   public void save(AppointmentService appointmentService) {
+    try (Connection conn = dbFactory.newConnection()) {
+      save(appointmentService, conn);
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Override
+  public void save(AppointmentService appointmentService, Connection conn) {
     String sql = "INSERT INTO Appointment_Services (appointment_id, service_id, quantity, unit_price) VALUES (?, ?, ?, ?) RETURNING app_service_id";
-    try (Connection conn = dbFactory.newConnection();
-        PreparedStatement stmt = conn.prepareStatement(sql)) {
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
 
       stmt.setInt(1, appointmentService.getAppointmentId());
       stmt.setInt(2, appointmentService.getServiceId());

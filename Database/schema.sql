@@ -133,7 +133,15 @@ CREATE TABLE Appointment_Services (
     FOREIGN KEY (service_id) REFERENCES Services(service_id) ON DELETE CASCADE
 );
 
--- Indexes for optimization
 CREATE INDEX idx_patients_name ON Patients(last_name, first_name);
 CREATE INDEX idx_appointments_date ON Appointments(appointment_date);
 CREATE INDEX idx_appointment_services ON Appointment_Services(appointment_id);
+CREATE INDEX idx_doctors_department ON Doctors(department_id);
+CREATE INDEX idx_appointments_patient ON Appointments(patient_id);
+CREATE INDEX idx_appointments_doctor ON Appointments(doctor_id);
+CREATE INDEX idx_prescriptions_record ON Prescriptions(record_id);
+CREATE INDEX idx_prescriptions_medicine ON Prescriptions(medicine_id);
+CREATE INDEX idx_staff_department ON Staff(department_id);
+CREATE INDEX idx_app_services_service ON Appointment_Services(service_id);
+CREATE INDEX idx_doctors_name ON Doctors(last_name, first_name);
+CREATE INDEX idx_appointments_status ON Appointments(status);

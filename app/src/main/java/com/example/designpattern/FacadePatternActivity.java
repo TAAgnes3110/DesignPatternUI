@@ -24,7 +24,8 @@ import java.util.List;
 public class FacadePatternActivity extends AppCompatActivity {
 
   private HospitalFacade facade;
-  private TextInputEditText inputPatientId, inputDoctorId, inputDate, inputTime, inputAmount, inputServices;
+  private TextInputEditText inputPatientId, inputDoctorId, inputDate, inputTime, inputAmount, inputServices,
+      inputPurpose;
   private TextView textLog, textSummary;
   private List<Service> selectedServices = new ArrayList<>();
 
@@ -40,7 +41,8 @@ public class FacadePatternActivity extends AppCompatActivity {
         new BillingDAOImpl(dbFactory),
         new DoctorDAOImpl(dbFactory),
         new ServiceDAOImpl(dbFactory),
-        new AppointmentServiceDAOImpl(dbFactory));
+        new AppointmentServiceDAOImpl(dbFactory),
+        dbFactory);
 
     initViews();
     setupEvents();
@@ -53,6 +55,7 @@ public class FacadePatternActivity extends AppCompatActivity {
     inputTime = findViewById(R.id.inputFacadeTime);
     inputServices = findViewById(R.id.inputFacadeServices);
     inputAmount = findViewById(R.id.inputFacadeAmount);
+    inputPurpose = findViewById(R.id.inputFacadePurpose);
     textLog = findViewById(R.id.textFacadeLog);
     textSummary = findViewById(R.id.textFacadeSummary);
   }
@@ -202,20 +205,17 @@ public class FacadePatternActivity extends AppCompatActivity {
         int dId = Integer.parseInt(inputDoctorId.getText().toString());
         Date date = Date.valueOf(inputDate.getText().toString());
         Time time = Time.valueOf(inputTime.getText().toString() + ":00");
-
-        String amountStr = inputAmount.getText().toString().trim();
-        if (amountStr.isEmpty())
-          amountStr = "0";
-        BigDecimal amount = new BigDecimal(amountStr);
-
-        Appointment appt = facade.bookAppointment(pId, dId, date, time);
-
-        // Add services
-        for (Service s : selectedServices) {
-          facade.addServiceToAppointment(appt.getAppointmentId(), s, 1);
+        String purpose = inputPurpose.getText().toString();
+        if (purpose.isEmpty()) {
+          purpose = "Khám tổng quát";
         }
 
-        Billing bill = facade.processBilling(appt.getAppointmentId(), amount);
+        Appointment appt = facade.scheduleCompleteAppointment(pId, dId, date, time, purpose, selectedServices);
+
+        BigDecimal total = BigDecimal.ZERO;
+        for (Service s : selectedServices)
+          total = total.add(s.getPrice());
+        Billing bill = new Billing(0, appt.getAppointmentId(), total);
 
         showResult(pId, dId, appt, bill);
 

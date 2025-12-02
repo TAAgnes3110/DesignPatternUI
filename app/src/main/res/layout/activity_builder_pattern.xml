@@ -35,7 +35,7 @@
                 android:id="@+id/header_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Form 1: Nhập 1 Bảng (Builder)"
+                android:text="Form 1: Nhập 1 Bảng"
                 android:textAppearance="@style/TextAppearance.Material3.DisplaySmall"
                 android:textColor="@color/material_dynamic_primary10"
                 android:textStyle="bold"
